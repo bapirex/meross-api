@@ -39,7 +39,9 @@ def get_key(username, password, uts):
     }
     response = requests.post('https://iot.meross.com/v1/Auth/login', headers=headers, data=data)
     key = response.json()['data']['key']
-    return str(key)
+    userid = response.json()['data']['userid']
+    token = response.json()['data']['token']
+    return str(key), str(userid), str(token)
 
 def signing_key(message_id, key, uts):
     concat_string = '{}{}{}'.format(message_id, key, uts)
@@ -51,9 +53,12 @@ def login(username, password):
     current = get_unix_time()
     message_id = msg_id(current)
 
-    key = get_key(username, password, current)
+    key, userid, token = get_key(username, password, current)
     sign = signing_key(message_id,key, current)
 
+    print("{} {}".format("userId:", userid))
+    print("{} {}".format("key:", key))
+    print("{} {}".format("token:", token))
     print("{} {}".format("messageId:", message_id))
     print("{} {}".format("sign:", sign))
     print("{} {}".format("timestamp:", current))
